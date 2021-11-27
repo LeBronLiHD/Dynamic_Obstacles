@@ -19,7 +19,7 @@ RIGHT_Y = 2000
 DEBUG_IN_AREA = True
 TEST_MODE = True
 
-ROBOT_W = 0  #???
+ROBOT_W = 0  # last w of my_robot
 
 HEXAGON = [[1750, 2000],
            [-1750, 2000],
