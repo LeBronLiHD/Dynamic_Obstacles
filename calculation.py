@@ -52,7 +52,10 @@ def get_target(my_robot, global_vision, target, debugger):
 
 
 def get_command(my_robot, tar_one, tar_two):
-    vx, vw = algorithm.get_omage_vel(my_robot, tar_one)
+    vx, vw, dis, delta = algorithm.get_omage_vel(my_robot, tar_one)
+    if abs(vw) <= abs(delta * parameters.P_W) or vw * delta < 0:
+        if abs(delta * parameters.P_W) < parameters.MAX_W:
+            vw = delta * parameters.P_W
     if parameters.DEBUG_IN_AREA:
         print("vx ->", vx, "   vw ->", vw)
     return vx, vw

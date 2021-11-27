@@ -5,7 +5,7 @@ MAX_W_ACC = 5  # rad/s^2
 
 FRESH_CYCLE = 0.1
 
-P_W = 5
+P_W = 1
 I_W = 0
 D_W = 0
 

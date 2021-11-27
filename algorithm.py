@@ -27,13 +27,19 @@ def get_dis_delta(my_robot, target, is_obstacle=False, debug=False):
     delta = my_robot.orientation - orientation_target
     if is_obstacle:
         delta = -delta
+    if abs(delta) > math.pi:
+        if delta < 0:
+            delta += 2 * math.pi
+        else:
+            delta -= 2 * math.pi
+        delta = -delta
     return distance, delta
 
 
 def if_we_could_full_speed(distance, current):
     acc_time = (parameters.MAX_VEL - current)/parameters.MAX_VEL_ACC
     acc_cur = 0.5 * (parameters.MAX_VEL + current) * acc_time
-    zero_max = 0.5 * parameters.MAX_VEL_ACC * parameters.FRESH_CYCLE ** 2
+    zero_max = (parameters.MAX_VEL - parameters.MAX_VEL_ACC * parameters.FRESH_CYCLE) * parameters.FRESH_CYCLE
     all_max = parameters.FRESH_CYCLE * parameters.MAX_VEL
     if parameters.DEBUG_IN_AREA:
         print("if_we_could_full_speed ->", distance, zero_max, all_max)
@@ -43,11 +49,11 @@ def if_we_could_full_speed(distance, current):
 def if_we_could_full_rudder(delta, current):
     acc_time = (parameters.MAX_W - current) / parameters.MAX_W_ACC
     acc_cur = 0.5 * (parameters.MAX_W + current) * acc_time
-    zero_max = 0.5 * parameters.MAX_W_ACC * parameters.FRESH_CYCLE ** 2
+    zero_max = (parameters.MAX_W - parameters.MAX_W_ACC * parameters.FRESH_CYCLE) * parameters.FRESH_CYCLE
     all_max = parameters.MAX_W * parameters.FRESH_CYCLE
     if parameters.DEBUG_IN_AREA:
         print("if_we_could_full_rudder ->", delta, zero_max, all_max)
-    return abs(delta) >= zero_max + all_max, acc_time >= parameters.FRESH_CYCLE
+    return abs(delta) >= zero_max + all_max, acc_time >= parameters.FRESH_CYCLE,
 
 
 def if_over_limit(current):
@@ -103,12 +109,15 @@ def get_omage_vel(my_robot, target):
         parameters.ROBOT_W = w
         if flag_w and abs(w) > parameters.MAX_W/2.0:
             vel /= 4.0
-        return vel, w
+        return vel, w, distance, delta
     elif flag_w:
-        return 500, w
+        parameters.ROBOT_W = w
+        return 500, w, distance, delta
     elif flag_v:
-        return vel, 0
+        parameters.ROBOT_W = 0
+        return vel, 0, distance, delta
     else:
+        parameters.ROBOT_W = 0
         print("impossible")
-        return 500, 0
+        return 500, 0, distance, delta
 

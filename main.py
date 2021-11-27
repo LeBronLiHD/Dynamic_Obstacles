@@ -27,9 +27,11 @@ if __name__ == '__main__':
         else:
             if calculation.in_circle(target, Point(vision.my_robot.x, vision.my_robot.y), 200):
                 index += 1
+                if index == 6:
+                    print("one entire circle")
+                    index = 0
                 target = Point(parameters.HEXAGON[index][0], parameters.HEXAGON[index][1])
                 debugger.draw_circle(target.x, target.y, 50)
-                index = index // 6
                 print("target changed to ->", target.x, target.y)
         tar_one, tar_two = calculation.get_target(vision.my_robot, vision, target=target, debugger=debugger)
         vx, vw = calculation.get_command(vision.my_robot, tar_one, tar_two)
