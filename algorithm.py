@@ -65,11 +65,46 @@ def if_over_limit(current):
     return current
 
 
-def get_omage_vel(my_robot, target):
+def get_omage_vel(my_robot, target, is_simple=False):
     distance, delta = get_dis_delta(my_robot, target, debug=True)
     if parameters.DEBUG_IN_AREA:
         print("distance ->", distance, "   delta ->", delta)
     vel, w, flag_v, flag_w = 0, 0, False, False
+    if is_simple:
+        if abs(delta) > parameters.S_MAX_DELTA:
+            abs_w = parameters.P_W * abs(delta)
+            abs_w = min(abs_w, parameters.MAX_W)
+            if parameters.S_CHANGE_W:
+                parameters.S_CHANGE_W = False
+                parameters.S_HAS_KEPT = 0
+                if delta > 0:
+                    parameters.S_W_DIRECTION = "left"
+                    return 0, abs_w, distance, delta
+                else:
+                    parameters.S_W_DIRECTION = "right"
+                    return 0, -abs_w, distance, delta
+            else:
+                parameters.S_HAS_KEPT += 1
+                if parameters.S_HAS_KEPT >= parameters.S_KEEP_DIR:
+                    parameters.S_CHANGE_W = True
+                if parameters.S_W_DIRECTION == "left":
+                    return 0, abs_w, distance, delta
+                elif parameters.S_W_DIRECTION == "right":
+                    return 0, -abs_w, distance, delta
+                else:
+                    print("Error! parameters.S_W_DIRECTION inValid!")
+        else:
+            parameters.S_CHANGE_W = True
+            parameters.S_HAS_KEPT = 0
+            p_vel = parameters.P_V * distance
+            p_vel = min(parameters.MAX_VEL, p_vel)
+            p_vel = max(parameters.S_MIN_VEL, p_vel)
+            if distance > parameters.S_IN_TARGET_R:
+                return p_vel, 0, distance, delta
+            else:
+                if parameters.DEBUG_IN_AREA * parameters.S_IN_RATIO:
+                    print("already in target, return 0, 0")
+                return 0, 0, distance, delta
     flag_w_1, flag_w_2 = if_we_could_full_rudder(delta, parameters.ROBOT_W)
     flag_v_1, flag_v_2 = if_we_could_full_speed(distance, my_robot.vel_x)
     if parameters.DEBUG_IN_AREA:

@@ -45,17 +45,19 @@ def in_warning_area(vision, my_robot):
 def get_target(my_robot, global_vision, target, debugger):
     debugger.draw_circle(my_robot.x, my_robot.y, radius=parameters.DETECT_RADIUS)
     in_area = in_warning_area(global_vision, my_robot)
-    # for i in range(len(in_area)):
-    #     if parameters.DEBUG_IN_AREA:
-    #         print(in_area[i])
+    for i in range(len(in_area)):
+        if parameters.DEBUG_IN_AREA:
+            print(in_area[i])
+    
     return target, target
 
 
 def get_command(my_robot, tar_one, tar_two):
-    vx, vw, dis, delta = algorithm.get_omage_vel(my_robot, tar_one)
-    if abs(vw) <= abs(delta * parameters.P_W) or vw * delta < 0:
-        if abs(delta * parameters.P_W) < parameters.MAX_W:
-            vw = delta * parameters.P_W
+    vx, vw, dis, delta = algorithm.get_omage_vel(my_robot, tar_one, is_simple=parameters.SIMPLE_MODE)
+    if parameters.SIMPLE_MODE == False:
+        if abs(vw) <= abs(delta * parameters.P_W) or vw * delta < 0:
+            if abs(delta * parameters.P_W) < parameters.MAX_W:
+                vw = delta * parameters.P_W
     if parameters.DEBUG_IN_AREA:
         print("vx ->", vx, "   vw ->", vw)
     return vx, vw

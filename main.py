@@ -25,7 +25,7 @@ if __name__ == '__main__':
         if parameters.TEST_MODE == False:
             action.controlObs(vision)
         else:
-            if calculation.in_circle(target, Point(vision.my_robot.x, vision.my_robot.y), 200):
+            if calculation.in_circle(target, Point(vision.my_robot.x, vision.my_robot.y), parameters.S_IN_TARGET_R):
                 index += 1
                 if index == 6:
                     print("one entire circle")
