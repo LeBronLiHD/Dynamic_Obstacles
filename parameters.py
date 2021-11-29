@@ -19,7 +19,6 @@ LEFT_X = -3500
 LEFT_Y = -2000
 RIGHT_X = 3500
 RIGHT_Y = 2000
-tt = 1
 
 DEBUG_IN_AREA = True
 TEST_MODE = False

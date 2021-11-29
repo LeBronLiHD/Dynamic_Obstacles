@@ -48,7 +48,7 @@ def get_target(my_robot, global_vision, target, debugger):
     for i in range(len(in_area)):
         if parameters.DEBUG_IN_AREA:
             print(in_area[i])
-    
+
     return target, target
 
 
