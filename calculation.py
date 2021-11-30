@@ -45,9 +45,20 @@ def in_warning_area(vision, my_robot):
 def get_target(my_robot, global_vision, target, debugger):
     debugger.draw_circle(my_robot.x, my_robot.y, radius=parameters.DETECT_RADIUS)
     in_area = in_warning_area(global_vision, my_robot)
+    dis,delta = algorithm.get_dis_delta(my_robot, target, is_obstacle=False, debug=False)
     for i in range(len(in_area)):
         if parameters.DEBUG_IN_AREA:
             print(in_area[i])
+    rounds = []*12
+    print(in_area)
+    for i in range(12): #分为12*30°
+        for j in range(len(in_area)):
+            rounds[i] += (parameters.DETECT_RADIUS - in_area[1][j])*abs(-math.pi*11/24 + math.pi/12*i - in_area[2][j])
+        if (i == 0):
+            minrounds = rounds[i]
+        if (rounds[i] < minrounds):
+            minrounds = i
+    target = [minrounds,500]
 
     return target, target
 
