@@ -50,6 +50,7 @@ def get_target(my_robot, global_vision, target, debugger):
     for i in range(len(in_area)):
         if parameters.DEBUG_IN_AREA:
             print(in_area[i])
+
     rounds = []*12
     print(in_area)
     in_area = np.mat(in_area)
@@ -59,10 +60,12 @@ def get_target(my_robot, global_vision, target, debugger):
         for j in range(max_line):
             rounds[i] += (parameters.DETECT_RADIUS - in_area[1][j])*abs(-math.pi*11/24 + math.pi/12*i - in_area[2][j])
         if (i == 0):
-            minrounds = rounds[i]
+            minrounds = rounds[0]
+            min = 0
         if (rounds[i] < minrounds):
-            minrounds = i
-    target = [minrounds,500]
+            minrounds = rounds[i]
+            min = i
+    target = [-math.pi*11/24 + math.pi/12*min,500]
 
     return target, target
 
