@@ -51,7 +51,8 @@ def get_target(my_robot, global_vision, target, debugger):
         if parameters.DEBUG_IN_AREA:
             print(in_area[i])
 
-    rounds = []*12
+    # rounds = []*12
+    rounds = [0 for x in range(0, 12)]
     print(in_area)
     in_area = np.mat(in_area)
     print(in_area.shape[1])
