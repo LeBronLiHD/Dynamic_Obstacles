@@ -4,6 +4,7 @@ from vision import Vision
 from vision import Point
 from vision import Robot
 import math
+import numpy as np
 
 
 def circle(debug, target):
@@ -51,8 +52,11 @@ def get_target(my_robot, global_vision, target, debugger):
             print(in_area[i])
     rounds = []*12
     print(in_area)
+    in_area = np.mat(in_area)
+    print(in_area.shape[1])
+    max_line = in_area.shape[1]
     for i in range(12): #分为12*30°
-        for j in range(len(in_area)):
+        for j in range(max_line):
             rounds[i] += (parameters.DETECT_RADIUS - in_area[1][j])*abs(-math.pi*11/24 + math.pi/12*i - in_area[2][j])
         if (i == 0):
             minrounds = rounds[i]
