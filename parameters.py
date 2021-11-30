@@ -33,6 +33,8 @@ S_CONST_DELTA = 2.5
 S_IN_TARGET_R = 200
 S_IN_RATIO = 0.75
 S_MIN_VEL = 1000
+S_CAKES = 12
+S_TARGET_DIS = 500
 
 ROBOT_W = 0  # last w of my_robot
 

@@ -43,6 +43,16 @@ def in_warning_area(vision, my_robot):
     return in_area
 
 
+def transfer(angle, abs_value=False):
+    if angle <= math.pi:
+        return angle
+    else:
+        if abs_value == False:
+            return angle - 2 * math.pi
+        else:
+            return 2 * math.pi - angle
+
+
 def get_target(my_robot, global_vision, target, debugger):
     debugger.draw_circle(my_robot.x, my_robot.y, radius=parameters.DETECT_RADIUS)
     in_area = in_warning_area(global_vision, my_robot)
@@ -52,22 +62,24 @@ def get_target(my_robot, global_vision, target, debugger):
             print(in_area[i])
 
     # rounds = []*12
-    rounds = [0 for x in range(0, 12)]
-    print(in_area)
+    rounds = [0 for _ in range(0, parameters.S_CAKES)]
     in_area = np.mat(in_area)
     print(in_area.shape[1])
     max_line = in_area.shape[1]
-    for i in range(12): #分为12*30°
+    for i in range(parameters.S_CAKES): #分为——12*30°
         for j in range(max_line):
-            rounds[i] += (parameters.DETECT_RADIUS - in_area[1][j])*abs(-math.pi*11/24 + math.pi/12*i - in_area[2][j])
+            rounds[i] += (parameters.DETECT_RADIUS - in_area[1][j]) * \
+                         abs(math.pi - transfer(abs(transfer(math.pi/12*i) - in_area[2][j]), abs_value=True))
+    minrounds, min_index = -1, -1
+    for i in range(parameters.S_CAKES):
         if (i == 0):
             minrounds = rounds[0]
-            min = 0
+            min_index = 0
         if (rounds[i] < minrounds):
             minrounds = rounds[i]
-            min = i
-    target = [-math.pi*11/24 + math.pi/12*min,500]
-
+            min_index = i
+    target = Point(my_robot.x + parameters.S_TARGET_DIS * math.cos(min_index * math.pi/12 + my_robot.orientation),
+                   my_robot.y + parameters.S_TARGET_DIS * math.sin(min_index * math.pi/12 + my_robot.orientation))
     return target, target
 
 
