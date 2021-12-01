@@ -20,11 +20,13 @@ def in_circle(center, point, radius=300):
 def switch_direction(left, right, my_robot, target, debugger, radius=300):
     if in_circle(target, Point(my_robot.x, my_robot.y), radius=radius):
         if target == left:
-            print("target switched to -> right ->", right.x, right.y)
+            print("target switched to -> right ->", right.x, right.y, "=============================================="
+                                                                      "===========================================")
             debugger.draw_circle(right.x, right.y, 50)
             return right
         else:
-            print("target switched to -> left ->", left.x, left.y)
+            print("target switched to -> left ->", left.x, left.y, "=================================================="
+                                                                   "=======================================")
             debugger.draw_circle(left.x, left.y, 50)
             return left
     else:
@@ -54,10 +56,31 @@ def transfer(angle, abs_value=False):
             return 2 * math.pi - angle
 
 
+def angle_to_target(my_robot, obstacle, target, debug=False):
+    x_my = my_robot.x
+    y_my = my_robot.y
+    x_ob = obstacle.x
+    y_ob = obstacle.y
+    x_ta = target.x
+    y_ta = target.y
+    vector_one = Point(x_ob - x_my, y_ob - y_my)
+    vector_two = Point(x_ta - x_my, y_ta - y_my)
+    if debug:
+        print("vector one ->", vector_one.x, vector_one.y)
+        print("vector two ->", vector_two.x, vector_two.y)
+    if math.sqrt(vector_one.x ** 2 + vector_one.y ** 2) * math.sqrt(vector_two.x ** 2 + vector_two.y ** 2) == 0:
+        print("TuanTuan!!!!!")
+        return 0.1
+    cos_value = (vector_one.x * vector_two.x + vector_one.y * vector_two.y) / \
+                (math.sqrt(vector_one.x ** 2 + vector_one.y ** 2) * math.sqrt(vector_two.x ** 2 + vector_two.y ** 2))
+    angle = math.acos(cos_value)
+    return parameters.S_TO_TARGET * (math.pi - angle) / math.pi
+
+
 def get_target(my_robot, global_vision, target, debugger):
     debugger.draw_circle(my_robot.x, my_robot.y, radius=parameters.DETECT_RADIUS)
     in_area = in_warning_area(global_vision, my_robot)
-    dis,delta = algorithm.get_dis_delta(my_robot, target, is_obstacle=False, debug=False)
+    dis, delta = algorithm.get_dis_delta(my_robot, target, is_obstacle=False, debug=False)
     for i in range(len(in_area)):
         if parameters.DEBUG_IN_AREA:
             print(in_area[i])
@@ -66,37 +89,21 @@ def get_target(my_robot, global_vision, target, debugger):
 
     print(len(in_area[0]))
     max_line = len(in_area[0])
-    for i in range(parameters.S_CAKES): #分为——12*30°
+    for i in range(parameters.S_CAKES): # 分为——12*30°
         for j in range(max_line):
             rounds[i] += (parameters.DETECT_RADIUS - in_area[1][j]) * \
-                         abs(math.pi - transfer(abs(transfer(math.pi/12*i) - in_area[2][j]), abs_value=True))
-        print( rounds[i])
-    best_orein = 0
-    min_index = []
-    min_orein = heapq.nsmallest(3, rounds)
-    angle_rounds = [0 for i in range(3)]
-    for t in min_orein:
-        index = rounds.index(t)
-        min_index.append(index)
-        rounds[index] = 0
-    for i in range (0,3):
-        for j in range(max_line):
-            angle_rounds[i] += abs(math.pi - transfer(abs(transfer(math.pi / 12 * min_index[i]) - in_area[2][j])))
-    print(min_index)
-    print(min_orein)
-    for i in range(3):
-        if (i == 0):
-            best_angle= angle_rounds[0]
-            best_orein = 0
-        if (angle_rounds[i] < best_orein):
-            best_angle = angle_rounds[i]
-            best_orein = i
-    best_angle = min_index[best_orein] * math.pi/12
-    print(best_angle)
-    target = Point(my_robot.x + parameters.S_TARGET_DIS * math.cos(best_angle * math.pi/12 + my_robot.orientation),
-                   my_robot.y + parameters.S_TARGET_DIS * math.sin(best_angle * math.pi/12 + my_robot.orientation))
-    debugger.draw_circle(target.x,target.y,radius=50)
-    return target, target
+                         abs(math.pi - transfer(abs(transfer(math.pi/6 * i) - in_area[2][j]),
+                                                abs_value=True))
+            rounds[i] += angle_to_target(my_robot, global_vision.obstacle(j), target, debug=False)
+    print(rounds)
+    if min(rounds) == 0:
+        best_round = delta/(math.pi/6)
+    else:
+        best_round = np.argmin(rounds)
+    target = Point(my_robot.x + parameters.S_TARGET_DIS * math.cos(best_round * math.pi/6 + my_robot.orientation),
+                   my_robot.y + parameters.S_TARGET_DIS * math.sin(best_round * math.pi/6 + my_robot.orientation))
+    debugger.draw_circle(target.x, target.y, radius=50)
+    return target, None
 
 
 def get_command(my_robot, tar_one, tar_two):

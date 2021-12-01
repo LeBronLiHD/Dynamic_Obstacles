@@ -96,11 +96,16 @@ def get_omage_vel(my_robot, target, is_simple=False):
         else:
             parameters.S_CHANGE_W = True
             parameters.S_HAS_KEPT = 0
+            abs_w = parameters.P_V_W * abs(delta)
+            abs_w = min(abs_w, parameters.MAX_W)
             p_vel = parameters.P_V * distance
             p_vel = min(parameters.MAX_VEL, p_vel)
             p_vel = max(parameters.S_MIN_VEL, p_vel)
             if distance > parameters.S_IN_TARGET_R:
-                return p_vel, 0, distance, delta
+                if delta > 0:
+                    return p_vel, abs_w, distance, delta
+                else:
+                    return p_vel, -abs_w, distance, delta
             else:
                 if parameters.DEBUG_IN_AREA * parameters.S_IN_RATIO:
                     print("already in target, return 0, 0")
